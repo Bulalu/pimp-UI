@@ -7,6 +7,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
 }
 
 nav {
@@ -50,4 +51,3 @@ footer {
   padding: 1rem;
   background-color: #f1f1f1;
 }
-

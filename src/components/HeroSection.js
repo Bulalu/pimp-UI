@@ -1,6 +1,13 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
+    const navigate = useNavigate();
+
+    const navigateToUpload = () => {
+        navigate('/upload');
+    };
+
     return (
         <div id="hero" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif', backgroundColor: '#f1f1f1', color: '#333', textAlign: 'center', padding: '5rem 0' }}>
             <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Transform Your Car Today</h1>
@@ -22,6 +29,7 @@ const HeroSection = () => {
             }} 
             onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
             onMouseOut={e => e.currentTarget.style.transform = 'scale(1.0)'}
+            onClick={navigateToUpload}
             >Get Started</button>
         </div>
     );

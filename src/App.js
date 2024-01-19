@@ -1,18 +1,24 @@
 import React from 'react';
-import Navbar from './components/Navbar';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HeroSection from './components/HeroSection';
 import DemoSection from './components/DemoSection';
-
-import './App.css';
+import ImageUploadPage from './components/ImageUploadPage'; 
 
 function App() {
   return (
-    <div className="App">
-      {/* <Navbar /> */}
-      <HeroSection />
-      <DemoSection />
-   
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={
+            <>
+              <HeroSection />
+              <DemoSection />
+            </>
+          } />
+          <Route path="/upload" element={<ImageUploadPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

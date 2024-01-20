@@ -7,7 +7,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
 }
 
 nav {
@@ -21,6 +20,7 @@ nav {
 .nav-links {
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .nav-links li {
@@ -50,4 +50,20 @@ footer {
   text-align: center;
   padding: 1rem;
   background-color: #f1f1f1;
+}
+
+@media screen and (max-width: 600px) {
+  nav {
+    flex-direction: column;
+  }
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+  }
+  .nav-links li {
+    padding: 1rem 0;
+  }
+  button {
+    width: 100%;
+  }
 }

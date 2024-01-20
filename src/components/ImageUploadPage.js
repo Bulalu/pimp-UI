@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { CompareSlider } from './CompareSlider';
+import { useNavigate } from 'react-router-dom';
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -35,6 +36,19 @@ const style = {
         marginTop: '10px',
         boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
     },
+    homeButton: {
+        backgroundColor: 'transparent',
+        color: '#007AFF',
+        border: '1px solid #007AFF',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        marginTop: '10px',
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+        position: 'absolute',
+        top: '10px',
+        left: '10px'
+    },
     image: {
         maxWidth: '100%',
         height: 'auto',
@@ -62,7 +76,7 @@ const ImageUploadPage = () => {
     const [error, setError] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [styleOption, setStyleOption] = useState('');
-
+    const navigate = useNavigate();
       const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
         setFile(file);
@@ -70,6 +84,10 @@ const ImageUploadPage = () => {
         const fileUrl = URL.createObjectURL(file);
         setOriginalImageUrl(fileUrl);
     }, []);
+
+    const navigateToUpload = () => {
+        navigate('/');
+    };
 
     console.log("file",file)
 
@@ -119,6 +137,7 @@ const ImageUploadPage = () => {
 
     return (
         <div style={style}>
+            <button style={style.homeButton} onClick={() => navigateToUpload()}>Home</button>
             <h1>Upload Your Car Image</h1>
             <input
                 type="text"

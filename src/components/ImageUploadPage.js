@@ -19,7 +19,10 @@ const style = {
         margin: '10px 0',
         padding: '10px',
         width: '80%',
-        maxWidth: '400px'
+        maxWidth: '400px',
+        borderRadius: '5px',
+        border: '1px solid #007AFF',
+        outline: 'none'
     },
     button: {
         backgroundColor: '#007AFF',
@@ -29,20 +32,29 @@ const style = {
         borderRadius: '5px',
         cursor: 'pointer',
         marginTop: '10px',
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
     }
 };
 
 const ImageUploadPage = () => {
     const [file, setFile] = useState(null);
     const [restoredImage, setRestoredImage] = useState(null);
+    const [originalImageUrl, setOriginalImageUrl] = useState(null);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [styleOption, setStyleOption] = useState('');
 
-    const onDrop = useCallback((acceptedFiles) => {
-        setFile(acceptedFiles[0]);
+      const onDrop = useCallback((acceptedFiles) => {
+        const file = acceptedFiles[0];
+        setFile(file);
+        // Create a URL for the original file
+        const fileUrl = URL.createObjectURL(file);
+        setOriginalImageUrl(fileUrl);
     }, []);
+
+    console.log("file",file)
 
     const handleGenerateClick = async () => {
         if (!file) {
@@ -59,21 +71,25 @@ const ImageUploadPage = () => {
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
 
+        for (let [key, value] of formData.entries()) { 
+            console.log(key, value); 
+        }
+
         try {
-            const response = await fetch("https://your-backend-endpoint/generate-image", {
+            const response = await fetch("https://fhgx6ogubqjq3l-5000.proxy.runpod.net/generate-image", {
                 method: "POST",
                 body: formData,
                 headers: {
                     'Accept': 'application/json',
                 },
             });
-
+        
             const data = await response.json();
-
+        
             if (response.status === 200) {
                 setRestoredImage(data.image_url);
             } else {
-                setError(data.error);
+                setError(data.error || 'An error occurred');
             }
         } catch (err) {
             setError(err.message);
@@ -100,15 +116,18 @@ const ImageUploadPage = () => {
                 style={style.input}
             >
                 <option value="">Select Style</option>
-                <option value="style1">Style 1</option>
-                <option value="style2">Style 2</option>
-                <option value="style3">Style 3</option>
+                <option value="Photographic">Photographic</option>
+                <option value="Cinematic">Cinematic</option>
+                <option value="Anime">Anime</option>
+                <option value="Fantasy art">Fantasy art</option>
+                <option value="Neonpunk">Neonpunk</option>
                 {/* Add more style options here */}
             </select>
             {error && <p>Error: {error}</p>}
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
+                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={{maxWidth: '100%'}}/>}
             </div>
             <button style={style.button} onClick={handleGenerateClick} disabled={loading}>
                 {loading ? 'Generating...' : 'Generate'}

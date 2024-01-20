@@ -81,8 +81,11 @@ const ImageUploadPage = () => {
     const [error, setError] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [styleOption, setStyleOption] = useState('');
+
+    const [remainingRequests, setRemainingRequests] = useState(3);
+
     const navigate = useNavigate();
-      const onDrop = useCallback((acceptedFiles) => {
+    const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
         setFile(file);
         // Create a URL for the original file
@@ -94,9 +97,14 @@ const ImageUploadPage = () => {
         navigate('/');
     };
 
-    console.log("file",file)
+    console.log("file", file)
 
     const handleGenerateClick = async () => {
+        if (remainingRequests === 0) {
+            setError("You have reached the daily limit for image generation requests.");
+            return;
+        }
+
         if (!file) {
             setError('Please upload an image first.');
             return;
@@ -111,8 +119,8 @@ const ImageUploadPage = () => {
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
 
-        for (let [key, value] of formData.entries()) { 
-            console.log(key, value); 
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
         }
 
         try {
@@ -123,11 +131,15 @@ const ImageUploadPage = () => {
                     'Accept': 'application/json',
                 },
             });
-        
+
             const data = await response.json();
-        
+            console.log(data);
+
             if (response.status === 200) {
                 setRestoredImage(data.image_url);
+                setRemainingRequests(prevCount => prevCount - 1);
+            } else if (response.status === 429) {
+                setError("You have reached the daily limit for image generation requests.")
             } else {
                 setError(data.error || 'An error occurred');
             }
@@ -166,23 +178,27 @@ const ImageUploadPage = () => {
                 {/* Add more style options here */}
             </select>
             {error && <p>Error: {error}</p>}
+            <p style={style.infoText}>
+                {`Note: You have ${remainingRequests} ${remainingRequests === 1 ? 'request' : 'requests'} remaining for today.`}
+            </p>
+
 
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
-                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
+                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image} />}
             </div>
             <button style={style.button} onClick={handleGenerateClick} disabled={loading}>
                 {loading ? 'Generating...' : 'Generate'}
             </button>
             {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
-                  {/* Display CompareSlider when both images are available */}
-                  {originalImageUrl && restoredImage && (
+            {/* Display CompareSlider when both images are available */}
+            {originalImageUrl && restoredImage && (
                 <div style={style.compareSlider}>
                     <CompareSlider original={originalImageUrl} restored={restoredImage} />
                 </div>
             )}
-            
+
         </div>
     );
 };

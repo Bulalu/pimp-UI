@@ -64,6 +64,11 @@ const style = {
         margin: '0 auto',
         marginTop: '20px',
         boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
+    },
+    infoText: {
+        fontSize: '1rem',
+        color: '#007AFF',
+        marginTop: '10px'
     }
 };
 
@@ -139,6 +144,7 @@ const ImageUploadPage = () => {
         <div style={style}>
             <button style={style.homeButton} onClick={() => navigateToUpload()}>Home</button>
             <h1>Upload Your Car Image</h1>
+            <p style={style.infoText}>Note: You can only generate 3 images per day. (hopefully 🤞)</p>
             <input
                 type="text"
                 placeholder="Enter your prompt"

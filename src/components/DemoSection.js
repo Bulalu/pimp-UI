@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const DemoSection = () => {
-    const images = ['/bima/og.JPG', '/bima/design.png', '/bima/neon.png', , '/bima/military.png', '/bima/whitebima.png'];
+    const images = ['/bima/og.JPG', '/bima/design.png', '/bima/neon.png', , '/bima/military.png', '/bima/whitebima.png', './bima/animebm.png'];
     const [current, setCurrent] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 

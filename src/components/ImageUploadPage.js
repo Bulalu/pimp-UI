@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { CompareSlider } from './CompareSlider';
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -32,6 +33,22 @@ const style = {
         borderRadius: '5px',
         cursor: 'pointer',
         marginTop: '10px',
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
+    },
+    image: {
+        maxWidth: '100%',
+        height: 'auto',
+        display: 'block',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        marginTop: '20px',
+        borderRadius: '5px',
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
+    },
+    compareSlider: {
+        maxWidth: '60%',
+        margin: '0 auto',
+        marginTop: '20px',
         boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
     }
 };
@@ -124,15 +141,23 @@ const ImageUploadPage = () => {
                 {/* Add more style options here */}
             </select>
             {error && <p>Error: {error}</p>}
+
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
-                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={{maxWidth: '100%'}}/>}
+                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
             </div>
             <button style={style.button} onClick={handleGenerateClick} disabled={loading}>
                 {loading ? 'Generating...' : 'Generate'}
             </button>
-            {restoredImage && <img src={restoredImage} alt="Restored" />}
+            {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
+                  {/* Display CompareSlider when both images are available */}
+                  {originalImageUrl && restoredImage && (
+                <div style={style.compareSlider}>
+                    <CompareSlider original={originalImageUrl} restored={restoredImage} />
+                </div>
+            )}
+            
         </div>
     );
 };

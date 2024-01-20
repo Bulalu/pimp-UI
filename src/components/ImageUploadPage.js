@@ -94,7 +94,7 @@ const ImageUploadPage = () => {
         navigate('/');
     };
 
-    console.log("file",file)
+    // console.log("file",file)
 
     const handleGenerateClick = async () => {
         if (!file) {
@@ -125,11 +125,20 @@ const ImageUploadPage = () => {
             });
         
             const data = await response.json();
-        
-            if (response.status === 200) {
-                setRestoredImage(data.image_url);
+          
+            if (response.status === 429) {
+                
+                // Handle rate limit error
+                setError("Rate limit exceeded. Please try again later.");
+            } else if (!response.ok) {
+                // Handle other types of errors
+                const errorData = await response.json();
+                console.log("kiko humu", errorData)
+                setError(errorData.error || 'An error occurred');
             } else {
-                setError(data.error || 'An error occurred');
+                // Success response
+                const data = await response.json();
+                setRestoredImage(data.image_url);
             }
         } catch (err) {
             setError(err.message);

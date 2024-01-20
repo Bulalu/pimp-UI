@@ -37,7 +37,7 @@ const DemoSection = () => {
 
     return (
         <div id="demo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-            <h2>latest Transformations</h2>
+            <h2>latest Pimps 🔥</h2>
             <div style={{ width: '80%', margin: '2rem 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem',  }}>
                 {images.map((img, index) => (
                     <img key={img} src={img} alt={`Transformation ${index}`} style={{ width: '100%', borderRadius: '10px', boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)', cursor: 'pointer' }} onClick={() => openModal(index)} />

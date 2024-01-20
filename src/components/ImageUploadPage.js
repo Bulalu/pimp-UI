@@ -4,6 +4,8 @@ import { CompareSlider } from './CompareSlider';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+const SERVER_DOWN = true
+
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
     color: '#333',
@@ -96,6 +98,11 @@ const ImageUploadPage = () => {
     };
 
     const handleGenerateClick = async () => {
+        if (SERVER_DOWN) {
+            setError("The servers are currently under maintenance, please check back later");
+           
+            return
+        }
         if (!file) {
             setError('Please upload an image first.');
             return;

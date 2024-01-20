@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { CompareSlider } from './CompareSlider';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -94,8 +95,6 @@ const ImageUploadPage = () => {
         navigate('/');
     };
 
-    // console.log("file",file)
-
     const handleGenerateClick = async () => {
         if (!file) {
             setError('Please upload an image first.');
@@ -110,10 +109,6 @@ const ImageUploadPage = () => {
         formData.append('image', file);
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
-
-        for (let [key, value] of formData.entries()) { 
-            console.log(key, value); 
-        }
 
         try {
             const response = await fetch("https://fhgx6ogubqjq3l-5000.proxy.runpod.net/generate-image", {
@@ -133,7 +128,6 @@ const ImageUploadPage = () => {
             } else if (!response.ok) {
                 // Handle other types of errors
                 const errorData = await response.json();
-                console.log("kiko humu", errorData)
                 setError(errorData.error || 'An error occurred');
             } else {
                 // Success response
@@ -150,21 +144,27 @@ const ImageUploadPage = () => {
     const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
     return (
-        <div style={style}>
-            <button style={style.homeButton} onClick={() => navigateToUpload()}>Home</button>
-            <h1>Upload Your Car Image</h1>
-            <p style={style.infoText}>Note: You can only generate 3 images per day. (hopefully 🤞)</p>
-            <input
+        <motion.div style={style} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+            <motion.button style={style.homeButton} onClick={() => navigateToUpload()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.button>
+            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}>Upload Your Car Image</motion.h1>
+            <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}>Note: You can only generate 3 images per day. (hopefully 🤞)</motion.p>
+            <motion.input
                 type="text"
                 placeholder="Enter your prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 style={style.input}
+                initial={{ y: -250 }}
+                animate={{ y: -10 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
             />
-            <select
+            <motion.select
                 value={styleOption}
                 onChange={(e) => setStyleOption(e.target.value)}
                 style={style.input}
+                initial={{ y: -250 }}
+                animate={{ y: -10 }}
+                transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
             >
                 <option value="">Select Style</option>
                 <option value="Photographic">Photographic</option>
@@ -173,7 +173,7 @@ const ImageUploadPage = () => {
                 <option value="Fantasy art">Fantasy art</option>
                 <option value="Neonpunk">Neonpunk</option>
                 {/* Add more style options here */}
-            </select>
+            </motion.select>
             {error && <p>Error: {error}</p>}
 
             <div {...getRootProps()} style={style.dropzone}>
@@ -181,9 +181,9 @@ const ImageUploadPage = () => {
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
                 {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
             </div>
-            <button style={style.button} onClick={handleGenerateClick} disabled={loading}>
+            <motion.button style={style.button} onClick={handleGenerateClick} disabled={loading} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 {loading ? 'Generating...' : 'Generate'}
-            </button>
+            </motion.button>
             {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
                   {/* Display CompareSlider when both images are available */}
                   {originalImageUrl && restoredImage && (
@@ -192,7 +192,7 @@ const ImageUploadPage = () => {
                 </div>
             )}
             
-        </div>
+        </motion.div>
     );
 };
 

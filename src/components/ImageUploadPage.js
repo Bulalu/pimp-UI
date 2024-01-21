@@ -4,6 +4,7 @@ import { CompareSlider } from './CompareSlider';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ThreeDots } from 'react-loader-spinner';
+import { downloadPhoto } from './utils';
 
 const SERVER_DOWN = false
 
@@ -89,6 +90,7 @@ const style = {
     }
 };
 
+
 const ImageUploadPage = () => {
     const [file, setFile] = useState(null);
     const [restoredImage, setRestoredImage] = useState(null);
@@ -110,7 +112,11 @@ const ImageUploadPage = () => {
     const navigateToUpload = () => {
         navigate('/');
     };
-
+    const handleDownloadClick = () => {
+        if (restoredImage) {
+          downloadPhoto(restoredImage, "restored-image.png");
+        }
+      };
     const handleGenerateClick = async () => {
         if (SERVER_DOWN) {
             setError("The servers are currently under maintenance, please check back later");
@@ -190,26 +196,27 @@ const ImageUploadPage = () => {
                 <option value="Anime">Anime</option>
                 <option value="Fantasy art">Fantasy art</option>
                 <option value="Neonpunk">Neonpunk</option>
-                {/* Add more style options here */}
             </motion.select>
             {error && <p>Error: {error}</p>}
-
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
                 {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
             </div>
             <motion.button style={style.button} onClick={handleGenerateClick} disabled={loading} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                 {loading ? <ThreeDots color="#EFEFF0" height={50} width={50} /> : 'Generate'}
+                {loading ? <ThreeDots color="#EFEFF0" height={50} width={50} /> : 'Generate'}
             </motion.button>
-            {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
-                  {/* Display CompareSlider when both images are available */}
-                  {originalImageUrl && restoredImage && (
-                <div style={style.compareSlider}>
-                    <CompareSlider original={originalImageUrl} restored={restoredImage} />
-                </div>
+            {restoredImage && (
+                <>
+                    <div style={style.compareSlider}>
+                        <CompareSlider original={originalImageUrl} restored={restoredImage} />
+                    </div>
+                    <button onClick={handleDownloadClick} style={style.button}>
+                        Download  Image
+                    </button>
+                </>
             )}
-            <p style={style.footer}>Built  by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>
+            <p style={style.footer}>Built by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>
         </motion.div>
     );
 };

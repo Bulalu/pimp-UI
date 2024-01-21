@@ -117,6 +117,17 @@ const ImageUploadPage = () => {
           downloadPhoto(restoredImage, "restored-image.png");
         }
       };
+
+      function downloadImage(imageUrl, filename = 'downloaded_image.png') {
+        const anchorElement = document.createElement('a');
+        anchorElement.href = imageUrl;
+        anchorElement.download = filename; 
+        anchorElement.target = '_blank'; // Open in a new tab if it navigates
+        document.body.appendChild(anchorElement); // Append to the document
+        anchorElement.click(); // Trigger click to download
+        document.body.removeChild(anchorElement); // Remove the element after download
+      }
+      
     const handleGenerateClick = async () => {
         if (SERVER_DOWN) {
             setError("The servers are currently under maintenance, please check back later");
@@ -127,6 +138,9 @@ const ImageUploadPage = () => {
             setError('Please upload an image first.');
             return;
         }
+
+
+          
 
         setLoading(true);
         setError(null);
@@ -211,9 +225,10 @@ const ImageUploadPage = () => {
                     <div style={style.compareSlider}>
                         <CompareSlider original={originalImageUrl} restored={restoredImage} />
                     </div>
-                    <button onClick={handleDownloadClick} style={style.button}>
-                        Download  Image
-                    </button>
+                   <button onClick={() => downloadImage(restoredImage, "restoredImage.png")} style={style.button}>
+                        Download Image
+                        </button>
+
                 </>
             )}
             <p style={style.footer}>Built by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>

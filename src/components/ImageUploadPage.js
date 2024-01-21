@@ -3,8 +3,9 @@ import { useDropzone } from 'react-dropzone';
 import { CompareSlider } from './CompareSlider';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { ThreeDots } from 'react-loader-spinner';
 
-const SERVER_DOWN = true
+const SERVER_DOWN = false
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -72,6 +73,19 @@ const style = {
         fontSize: '1rem',
         color: '#007AFF',
         marginTop: '10px'
+    },
+    footer: {
+        fontSize: '0.8rem',
+        color: '#007AFF',
+        marginTop: '30px'
+    },
+    loader: { // Style for the loader
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#F3F3F3', // Light gray background for a clean, Apple-like aesthetic
+        color: '#333' // Dark gray text for contrast and readability
     }
 };
 
@@ -127,18 +141,15 @@ const ImageUploadPage = () => {
             });
         
             const data = await response.json();
-          
+        
             if (response.status === 429) {
-                
                 // Handle rate limit error
                 setError("Rate limit exceeded. Please try again later.");
             } else if (!response.ok) {
                 // Handle other types of errors
-                const errorData = await response.json();
-                setError(errorData.error || 'An error occurred');
+                setError(data.error || 'An error occurred');
             } else {
                 // Success response
-                const data = await response.json();
                 setRestoredImage(data.image_url);
             }
         } catch (err) {
@@ -189,7 +200,7 @@ const ImageUploadPage = () => {
                 {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
             </div>
             <motion.button style={style.button} onClick={handleGenerateClick} disabled={loading} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                {loading ? 'Generating...' : 'Generate'}
+                 {loading ? <ThreeDots color="#EFEFF0" height={50} width={50} /> : 'Generate'}
             </motion.button>
             {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
                   {/* Display CompareSlider when both images are available */}
@@ -198,7 +209,7 @@ const ImageUploadPage = () => {
                     <CompareSlider original={originalImageUrl} restored={restoredImage} />
                 </div>
             )}
-            
+            <p style={style.footer}>Built  by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>
         </motion.div>
     );
 };

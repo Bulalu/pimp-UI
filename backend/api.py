@@ -30,7 +30,7 @@ from firebase_admin import credentials, storage
 # make sure you have a firebase config file
 cred = credentials.Certificate("your firebase config json file")
 firebase_admin.initialize_app(cred, {
-    'storageBucket': 'pimp-ui.appspot.com'
+    'storageBucket': 'your-bucket'
 })
 
 # Global variables for models

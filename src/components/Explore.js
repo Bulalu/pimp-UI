@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { storage } from './firebase';
 import { ThreeDots } from 'react-loader-spinner';
-import { getStorage, ref, listAll, getDownloadURL } from 'firebase/storage';
+import {  ref, listAll, getDownloadURL } from 'firebase/storage';
 
 const Explore = () => {
     const [images, setImages] = useState([]);

@@ -13,10 +13,10 @@ const Explore = () => {
             try {
                 const storageRef = ref(storage, 'images/'); 
                 const result = await listAll(storageRef); 
-                console.log("ListAll result:", result); 
+             
                 let urlPromises = result.items.map(imageRef => getDownloadURL(imageRef));
                 const urls = await Promise.all(urlPromises);
-                console.log("Image URLs:", urls); 
+           
                 setImages(urls);
                 setLoading(false);
             } catch (error) {

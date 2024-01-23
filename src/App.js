@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HeroSection from './components/HeroSection';
 import DemoSection from './components/DemoSection';
 import ImageUploadPage from './components/ImageUploadPage'; 
+import Explore from './components/Explore';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             </>
           } />
           <Route path="/upload" element={<ImageUploadPage />} />
+          <Route path="/explore" element={<Explore />} />
         </Routes>
       </div>
     </Router>

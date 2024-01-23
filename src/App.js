@@ -4,12 +4,13 @@ import HeroSection from './components/HeroSection';
 import DemoSection from './components/DemoSection';
 import ImageUploadPage from './components/ImageUploadPage'; 
 import Explore from './components/Explore';
-import { Analytics } from '@vercel/analytics/react';
-
+import { inject } from '@vercel/analytics';
+ 
+inject();
 function App() {
   return (
     <Router>
-       <Analytics />
+      
       <div className="App">
         <Routes>
           <Route path="/" element={

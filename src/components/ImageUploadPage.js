@@ -100,8 +100,11 @@ const ImageUploadPage = () => {
     const [error, setError] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [styleOption, setStyleOption] = useState('');
+
+    const [remainingRequests, setRemainingRequests] = useState(3);
+
     const navigate = useNavigate();
-      const onDrop = useCallback((acceptedFiles) => {
+    const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
         setFile(file);
         // Create a URL for the original file
@@ -151,6 +154,10 @@ const ImageUploadPage = () => {
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
 
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
         try {
             const response = await fetch("https://fhgx6ogubqjq3l-5000.proxy.runpod.net/generate-image", {
                 method: "POST",
@@ -159,7 +166,7 @@ const ImageUploadPage = () => {
                     'Accept': 'application/json',
                 },
             });
-        
+
             const data = await response.json();
         
             if (response.status === 429) {
@@ -171,6 +178,7 @@ const ImageUploadPage = () => {
             } else {
                 // Success response
                 setRestoredImage(data.image_url);
+                setRemainingRequests(prevCount => prevCount - 1)
             }
         } catch (err) {
             setError(err.message);
@@ -186,6 +194,7 @@ const ImageUploadPage = () => {
             <motion.button style={style.homeButton} onClick={() => navigateToUpload()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.button>
             <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}>Upload Your Car Image</motion.h1>
             <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}>Note: You can only generate 3 images per day. (hopefully 🤞)</motion.p>
+            <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}>You have {remainingRequests} {remainingRequests === 1 ? 'request' : 'requests'} remaining for today. 😉</motion.p>
             <motion.input
                 type="text"
                 placeholder="Enter your prompt"

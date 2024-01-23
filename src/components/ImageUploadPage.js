@@ -2,6 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { CompareSlider } from './CompareSlider';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ThreeDots } from 'react-loader-spinner';
+import { downloadPhoto } from './utils';
+
+const SERVER_DOWN = false
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -69,8 +74,22 @@ const style = {
         fontSize: '1rem',
         color: '#007AFF',
         marginTop: '10px'
+    },
+    footer: {
+        fontSize: '0.8rem',
+        color: '#007AFF',
+        marginTop: '30px'
+    },
+    loader: { // Style for the loader
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: '#F3F3F3', // Light gray background for a clean, Apple-like aesthetic
+        color: '#333' // Dark gray text for contrast and readability
     }
 };
+
 
 const ImageUploadPage = () => {
     const [file, setFile] = useState(null);
@@ -96,19 +115,35 @@ const ImageUploadPage = () => {
     const navigateToUpload = () => {
         navigate('/');
     };
-
-    console.log("file", file)
-
-    const handleGenerateClick = async () => {
-        if (remainingRequests === 0) {
-            setError("You have reached the daily limit for image generation requests.");
-            return;
+    const handleDownloadClick = () => {
+        if (restoredImage) {
+          downloadPhoto(restoredImage, "restored-image.png");
         }
+      };
 
+      function downloadImage(imageUrl, filename = 'downloaded_image.png') {
+        const anchorElement = document.createElement('a');
+        anchorElement.href = imageUrl;
+        anchorElement.download = filename; 
+        anchorElement.target = '_blank'; // Open in a new tab if it navigates
+        document.body.appendChild(anchorElement); // Append to the document
+        anchorElement.click(); // Trigger click to download
+        document.body.removeChild(anchorElement); // Remove the element after download
+      }
+      
+    const handleGenerateClick = async () => {
+        if (SERVER_DOWN) {
+            setError("The servers are currently under maintenance, please check back later");
+           
+            return
+        }
         if (!file) {
             setError('Please upload an image first.');
             return;
         }
+
+
+          
 
         setLoading(true);
         setError(null);
@@ -133,15 +168,17 @@ const ImageUploadPage = () => {
             });
 
             const data = await response.json();
-            console.log(data);
-
-            if (response.status === 200) {
-                setRestoredImage(data.image_url);
-                setRemainingRequests(prevCount => prevCount - 1);
-            } else if (response.status === 429) {
-                setError("You have reached the daily limit for image generation requests.")
-            } else {
+        
+            if (response.status === 429) {
+                // Handle rate limit error
+                setError("Rate limit exceeded. Please try again later.");
+            } else if (!response.ok) {
+                // Handle other types of errors
                 setError(data.error || 'An error occurred');
+            } else {
+                // Success response
+                setRestoredImage(data.image_url);
+                setRemainingRequests(prevCount => prevCount - 1)
             }
         } catch (err) {
             setError(err.message);
@@ -153,21 +190,28 @@ const ImageUploadPage = () => {
     const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
     return (
-        <div style={style}>
-            <button style={style.homeButton} onClick={() => navigateToUpload()}>Home</button>
-            <h1>Upload Your Car Image</h1>
-            <p style={style.infoText}>Note: You can only generate 3 images per day. (hopefully 🤞)</p>
-            <input
+        <motion.div style={style} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
+            <motion.button style={style.homeButton} onClick={() => navigateToUpload()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.button>
+            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}>Upload Your Car Image</motion.h1>
+            <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}>Note: You can only generate 3 images per day. (hopefully 🤞)</motion.p>
+            <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}>You have {remainingRequests} {remainingRequests === 1 ? 'request' : 'requests'} remaining for today. 😉</motion.p>
+            <motion.input
                 type="text"
                 placeholder="Enter your prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 style={style.input}
+                initial={{ y: -250 }}
+                animate={{ y: -10 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
             />
-            <select
+            <motion.select
                 value={styleOption}
                 onChange={(e) => setStyleOption(e.target.value)}
                 style={style.input}
+                initial={{ y: -250 }}
+                animate={{ y: -10 }}
+                transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
             >
                 <option value="">Select Style</option>
                 <option value="Photographic">Photographic</option>
@@ -175,31 +219,29 @@ const ImageUploadPage = () => {
                 <option value="Anime">Anime</option>
                 <option value="Fantasy art">Fantasy art</option>
                 <option value="Neonpunk">Neonpunk</option>
-                {/* Add more style options here */}
-            </select>
+            </motion.select>
             {error && <p>Error: {error}</p>}
-            <p style={style.infoText}>
-                {`Note: You have ${remainingRequests} ${remainingRequests === 1 ? 'request' : 'requests'} remaining for today.`}
-            </p>
-
-
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
                 <p>Drag 'n' drop your car image here, or click to select a file</p>
-                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image} />}
+                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
             </div>
-            <button style={style.button} onClick={handleGenerateClick} disabled={loading}>
-                {loading ? 'Generating...' : 'Generate'}
-            </button>
-            {/* {restoredImage && <img src={restoredImage} alt="Restored" style={style.image}/>} */}
-            {/* Display CompareSlider when both images are available */}
-            {originalImageUrl && restoredImage && (
-                <div style={style.compareSlider}>
-                    <CompareSlider original={originalImageUrl} restored={restoredImage} />
-                </div>
-            )}
+            <motion.button style={style.button} onClick={handleGenerateClick} disabled={loading} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                {loading ? <ThreeDots color="#EFEFF0" height={50} width={50} /> : 'Generate'}
+            </motion.button>
+            {restoredImage && (
+                <>
+                    <div style={style.compareSlider}>
+                        <CompareSlider original={originalImageUrl} restored={restoredImage} />
+                    </div>
+                   <button onClick={() => downloadImage(restoredImage, "restoredImage.png")} style={style.button}>
+                        Download Image
+                        </button>
 
-        </div>
+                </>
+            )}
+            <p style={style.footer}>Built by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>
+        </motion.div>
     );
 };
 

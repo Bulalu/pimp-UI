@@ -9,9 +9,9 @@ const HeroSection = () => {
     };
 
     return (
-        <div id="hero" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif', backgroundColor: '#f1f1f1', color: '#333', textAlign: 'center', padding: '5rem 0' }}>
-            <h1 style={{ fontSize: '3rem', fontWeight: 'bold' }}>Transform Your Car Today</h1>
-            <p style={{ fontSize: '1.5rem', margin: '2rem 0' }}>Experience the future of car styling.</p>
+        <div id="hero" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif', backgroundColor: '#f1f1f1', color: '#333', textAlign: 'center', padding: '5rem 0', maxWidth: '100vw', margin: '0 auto' }}>
+            <h1 style={{ fontSize: '3rem', fontWeight: 'bold', padding: '0 1rem' }}>Transform Your Car Today</h1>
+            <p style={{ fontSize: '1.5rem', margin: '2rem 0', padding: '0 1rem' }}>Experience the future of car styling.</p>
             <button style={{ 
                 backgroundColor: '#007AFF', 
                 color: '#FFFFFF', 
@@ -25,7 +25,10 @@ const HeroSection = () => {
                 textTransform: 'uppercase',
                 letterSpacing: '2px',
                 outline: 'none',
-                background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)'
+                background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
+                width: '80%',
+                maxWidth: '300px',
+                margin: '0 auto'
             }} 
             onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
             onMouseOut={e => e.currentTarget.style.transform = 'scale(1.0)'}

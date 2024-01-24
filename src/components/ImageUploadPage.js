@@ -7,7 +7,6 @@ import { ThreeDots } from 'react-loader-spinner';
 import { downloadPhoto } from './utils';
 
 const SERVER_DOWN = true
-
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
     color: '#333',

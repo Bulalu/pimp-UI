@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { storage } from './firebase';
 import { ThreeDots } from 'react-loader-spinner';
-import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import { ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
 
 const Explore = () => {
     const [images, setImages] = useState([]);
@@ -15,16 +15,29 @@ const Explore = () => {
             try {
                 const storageRef = ref(storage, 'images/');
                 const result = await listAll(storageRef);
-
-                let urlPromises = result.items.map(imageRef => getDownloadURL(imageRef));
-                const urls = await Promise.all(urlPromises);
-
+        
+                let metadataPromises = result.items.map(imageRef => 
+                    getMetadata(imageRef).then(metadata => ({
+                        url: getDownloadURL(imageRef),
+                        lastModified: new Date(metadata.updated)
+                    }))
+                );
+        
+                let metadata = await Promise.all(metadataPromises);
+                // Sort images based on last modified date in descending order
+                metadata.sort((a, b) => b.lastModified - a.lastModified);
+        
+                // Resolve URLs after sorting
+                let urls = await Promise.all(metadata.map(item => item.url));
+                console.log(urls);
+        
                 setImages(urls);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching images:", error);
             }
-        }
+        };
+        
         fetchImages();
     }, []);
 

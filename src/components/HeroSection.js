@@ -9,9 +9,23 @@ const HeroSection = () => {
     };
 
     return (
-        <div id="hero" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif', backgroundColor: '#f1f1f1', color: '#333', textAlign: 'center', padding: '5rem 0', maxWidth: '100vw', margin: '0 auto' }}>
-            <h1 style={{ fontSize: '3rem', fontWeight: 'bold', padding: '0 1rem' }}>Transform Your Car Today</h1>
-            <p style={{ fontSize: '1.5rem', margin: '2rem 0', padding: '0 1rem' }}>Experience the future of car styling.</p>
+        <div id="hero" style={{ 
+            fontFamily: 'inherit', // Inherits font from global styles
+            textAlign: 'center', 
+            padding: '5rem 0', 
+            maxWidth: '100vw', 
+            margin: '0 auto' 
+        }}>
+            <h1 style={{ 
+                fontSize: '3rem', 
+                fontWeight: 'bold', 
+                padding: '0 1rem' 
+            }}>Re-imagine Your Assets Today</h1>
+            <p style={{ 
+                fontSize: '1.5rem', 
+                margin: '2rem 0', 
+                padding: '0 1rem' 
+            }}>Experience the future of  styling.</p>
             <button style={{ 
                 backgroundColor: '#007AFF', 
                 color: '#FFFFFF', 
@@ -39,3 +53,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+

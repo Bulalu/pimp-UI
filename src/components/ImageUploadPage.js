@@ -191,7 +191,7 @@ const ImageUploadPage = () => {
     return (
         <motion.div style={style} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
             <motion.button style={style.homeButton} onClick={() => navigateToUpload()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.button>
-            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }}>Upload Your Car Image</motion.h1>
+            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }} style={{ color: '#FFFFFF' }}>Upload Your Car/Room Image</motion.h1>
             {/* <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}>Note: You can only generate 3 images per day. (hopefully 🤞)</motion.p> */}
             <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}>You have {remainingRequests} {remainingRequests === 1 ? 'request' : 'requests'} remaining for today. 😉</motion.p>
             <motion.input

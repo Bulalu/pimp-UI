@@ -1,81 +1,150 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DemoSection = () => {
-    const images = ['/bima/og.JPG', '/bima/design.png', '/bima/neon.png', '/bima/military.png', '/bima/whitebima.png', './bima/animebm.png'];
-    const [current, setCurrent] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate();
+  const carImages = ['/bima/og.JPG', '/bima/design.png', '/bima/neon.png', '/bima/military.png'];
+  const roomImages = ['/room/ogroom.jpeg', '/room/pinkroom.png', '/room/tropicalbed.png', '/room/livingroom.jpeg', '/room/profsittingroom.png', '/room/tropicallivingroom.png'];
 
-    const handleNext = () => {
-        setCurrent(current === images.length - 1 ? 0 : current + 1);
-    };
+  const [current, setCurrent] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [key, setKey] = useState('rooms'); // 'cars' or 'rooms'
+  const navigate = useNavigate();
 
-    const handlePrev = () => {
-        setCurrent(current === 0 ? images.length - 1 : current - 1);
-    };
+  const openModal = (index) => {
+    setCurrent(index);
+    setIsModalOpen(true);
+  };
 
-    const openModal = (index) => {
-        setCurrent(index);
-        setIsModalOpen(true);
-    };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
+  const navigateToExplore = () => {
+    navigate('/explore');
+  };
 
-    const navigateToExplore = () => {
-        navigate('/explore');
-    };
+  const imageContainerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: '2rem',
+    padding: '2rem 0'
+  };
 
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        return () => document.head.removeChild(style);
-    }, []);
+  const imageStyle = {
+    width: 'calc(90% / 3 - 2rem)',
+    maxWidth: 'calc(90% / 3 - 2rem)',
+    height: 'auto',
+    borderRadius: '20px',
+    boxShadow: '0 6px 20px rgba(0,0,0,0.15)',
+    cursor: 'pointer',
+    transition: 'transform .3s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.03)'
+    }
+  };
 
-    return (
-        <div id="demo" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-            <h2>latest Pimps 🔥</h2>
-            <button onClick={navigateToExplore} style={{
-                position: 'absolute',
-                top: '400px',
-                right: '10px',
-                backgroundColor: '#007AFF',
-                color: 'white',
-                border: 'none',
-                padding: '0.5rem 1rem',
-                borderRadius: '50px',
-                cursor: 'pointer',
-                boxShadow: '0 0 10px #007AFF, 0 0 40px #007AFF, 0 0 80px #007AFF',
-                transition: 'all 0.3s ease-in-out',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                outline: 'none',
-                background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%)',
-                fontSize: '0.8rem'
-            }}>Explore</button>
-            <div style={{ width: '80%', margin: '2rem 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem',  }}>
-                {images.map((img, index) => (
-                    <img key={img} src={img} alt={`Transformation ${index}`} style={{ width: '100%', borderRadius: '10px', boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)', cursor: 'pointer' }} onClick={() => openModal(index)} />
-                ))}
-            </div>
-            {isModalOpen && (
-                <div onClick={closeModal} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', animation: 'fadeIn 0.5s' }}>
-                    <img src={images[current]} alt="demo large" style={{ maxWidth: '80%', maxHeight: '80%', borderRadius: '10px', boxShadow: '0 8px 16px 0 rgba(0,0,0,0.2)' }} />
-                </div>
-            )}
+  const tabStyle = {
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '30px',
+    background: '#f0f0f0',
+    boxShadow: 'inset 0 0 5px rgba(0,0,0,0.2)',
+    fontSize: '1rem',
+    fontWeight: 'bold',
+    color: '#333',
+    margin: '0 10px',
+    '&:focus': {
+      outline: 'none',
+      boxShadow: '0 0 10px rgba(0,0,0,0.5)'
+    }
+  };
+
+  const activeTabStyle = {
+    ...tabStyle,
+    background: '#fff',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+  };
+
+  return (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '2rem 0', zIndex: isModalOpen ? -1 : 1 }}>
+        <Button
+          style={key === 'cars' ? activeTabStyle : tabStyle}
+          onClick={() => setKey('cars')}
+        >
+          Cars
+        </Button>
+        <Button
+          style={key === 'rooms' ? activeTabStyle : tabStyle}
+          onClick={() => setKey('rooms')}
+        >
+          Rooms
+        </Button>
+        <Button
+          style={key === 'rooms' ? activeTabStyle : tabStyle}
+          onClick={() => navigateToExplore()}
+        >
+          explore
+        </Button>
+      </div>
+      {key === 'cars' && (
+        <div style={imageContainerStyle}>
+          {carImages.map((src, index) => (
+            <img
+              key={`car-${index}`}
+              src={src}
+              alt={`Car ${index}`}
+              style={imageStyle}
+              onClick={() => openModal(index)}
+            />
+          ))}
         </div>
-    );
+      )}
+      {key === 'rooms' && (
+        <div style={imageContainerStyle}>
+          {roomImages.map((src, index) => (
+            <img
+              key={`room-${index}`}
+              src={src}
+              alt={`Room ${index}`}
+              style={imageStyle}
+              onClick={() => openModal(index + carImages.length)}
+            />
+          ))}
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div onClick={closeModal} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 2,
+        }}>
+          <img
+            src={key === 'cars' ? carImages[current] : roomImages[current - carImages.length]}
+            alt="demo large"
+            style={{
+              maxWidth: '80%',
+              maxHeight: '80%',
+              borderRadius: '20px',
+              boxShadow: '0 12px 24px rgba(0,0,0,0.2)',
+              objectFit: 'cover'
+            }}
+          />
+        </div>
+      )}
+    </>
+  );
 };
 
 export default DemoSection;
-
-

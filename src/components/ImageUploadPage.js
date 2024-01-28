@@ -72,8 +72,9 @@ const style = {
         maxWidth: '60%',
         margin: '0 auto',
         marginTop: '20px',
-        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
-    },
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+      
+      },
 
     infoText: {
         fontSize: '1rem',

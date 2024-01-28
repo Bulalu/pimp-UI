@@ -12,7 +12,7 @@ const Explore = () => {
     const [roomImages, setRoomImages] = useState([]);
     const [loading, setLoading] = useState({ cars: true, rooms: true });
     const [selectedImage, setSelectedImage] = useState(null);
-    const [key, setKey] = useState('images');
+    const [key, setKey] = useState('rooms'); 
     const navigate = useNavigate();
     console.log("car images", carImages)
 
@@ -130,9 +130,9 @@ const Explore = () => {
         <>
         
             <button style={homeButtonStyle} onClick={navigateHome}>Home</button>
-            <Tabs defaultActiveKey="images" id="controlled-tab-example" onSelect={(k) => setKey(k === 'images' ? 'cars' : k)} className="tabStyles">
+            <Tabs defaultActiveKey="rooms" id="controlled-tab-example" onSelect={(k) => setKey(k === 'images' ? 'cars' : k)} className="tabStyles">
                 <Tab eventKey="cars" title="Cars">
-                    <div style={imageStyles}>
+                    <div className="imageGrid" >
                         {loading.images ? (
                             <div style={loaderStyles}>
                                 <Spinner animation="border" variant="primary" />
@@ -147,13 +147,13 @@ const Explore = () => {
                     </div>
                 </Tab>
                 <Tab eventKey="rooms" title="Rooms">
-                    <div style={imageStyles}>
+                    <div className="imageGrid" >
                         {loading.rooms ? (
                             <div style={loaderStyles}>
                                 <Spinner animation="border" variant="primary" />
                             </div>
                         ) : (
-                            roomImages.map((url, index) => (
+                            roomImages.slice().reverse().map((url, index) => (
                                 <div key={index} style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '10px' }}>
                                     <img src={url} alt={`Room Content ${index}`} style={imgStyles} onClick={() => handleImageClick(url)} />
                                 </div>
@@ -175,3 +175,4 @@ const Explore = () => {
 };
 
 export default Explore;
+

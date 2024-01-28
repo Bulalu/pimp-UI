@@ -8,44 +8,36 @@ import Tab from 'react-bootstrap/Tab';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Explore = () => {
-    const [images, setImages] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [carImages, setCarImages] = useState([]);
+    const [roomImages, setRoomImages] = useState([]);
+    const [loading, setLoading] = useState({ cars: true, rooms: true });
     const [selectedImage, setSelectedImage] = useState(null);
-    const [key, setKey] = useState('cars'); // 'cars' or 'rooms'
+    const [key, setKey] = useState('rooms'); 
     const navigate = useNavigate();
+    console.log("car images", carImages)
 
     useEffect(() => {
-        if (key === 'cars') {
-            const fetchImages = async () => {
-                try {
-                    const storageRef = ref(storage, 'images/');
-                    const result = await listAll(storageRef);
-
-                    let metadataPromises = result.items.map(imageRef => 
-                        getMetadata(imageRef).then(metadata => ({
-                            url: getDownloadURL(imageRef),
-                            lastModified: new Date(metadata.updated)
-                        }))
-                    );
-
-                    let metadata = await Promise.all(metadataPromises);
-                    metadata.sort((a, b) => b.lastModified - a.lastModified);
-
-                    let urls = await Promise.all(metadata.map(item => item.url));
-                    console.log(urls);
-
-                    setImages(urls);
-                    setLoading(false);
-                } catch (error) {
-                    console.error("Error fetching images:", error);
+        const fetchImages = async (imageType) => {
+            try {
+                const storageRef = ref(storage, `${imageType}/`);
+                const result = await listAll(storageRef);
+                const urls = await Promise.all(result.items.map((imageRef) => getDownloadURL(imageRef)));
+                if (imageType === 'images') {
+                    setCarImages(urls);
+                } else if (imageType === 'rooms') {
+                    setRoomImages(urls);
                 }
-            };
+                setLoading(prev => ({ ...prev, [imageType]: false }));
+            } catch (error) {
+                console.error(`Error fetching ${imageType} images:`, error);
+                setLoading(prev => ({ ...prev, [imageType]: false }));
+            }
+        };
 
-            fetchImages();
-        }
-    }, [key]);
-
-    
+        // Pre-fetching both sets of images
+        fetchImages('images');
+        fetchImages('rooms');
+    }, []);
 
     const handleImageClick = (url) => {
         setSelectedImage(url);
@@ -133,29 +125,40 @@ const Explore = () => {
         }
     };
 
+    
     return (
         <>
+        
             <button style={homeButtonStyle} onClick={navigateHome}>Home</button>
-            <Tabs defaultActiveKey="cars" id="controlled-tab-example" onSelect={(k) => setKey(k)} className={tabStyles}>
+            <Tabs defaultActiveKey="rooms" id="controlled-tab-example" onSelect={(k) => setKey(k === 'images' ? 'cars' : k)} className="tabStyles">
                 <Tab eventKey="cars" title="Cars">
-                    <div style={imageStyles}>
-                        {loading ? (
+                    <div className="imageGrid" >
+                        {loading.images ? (
                             <div style={loaderStyles}>
                                 <Spinner animation="border" variant="primary" />
                             </div>
                         ) : (
-                            images.map((url, index) => (
+                            carImages.map((url, index) => (
                                 <div key={index} style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '10px' }}>
-                                    <img src={url} alt={`Content ${index}`} style={imgStyles} onClick={() => handleImageClick(url)} />
+                                    <img src={url} alt={`Car Content ${index}`} style={imgStyles} onClick={() => handleImageClick(url)} />
                                 </div>
                             ))
                         )}
                     </div>
                 </Tab>
                 <Tab eventKey="rooms" title="Rooms">
-                    <div style={imageStyles}>
-                        <p>Coming Soon...</p>
-                        {/* Here you will insert the logic for fetching and displaying room images in the future */}
+                    <div className="imageGrid" >
+                        {loading.rooms ? (
+                            <div style={loaderStyles}>
+                                <Spinner animation="border" variant="primary" />
+                            </div>
+                        ) : (
+                            roomImages.slice().reverse().map((url, index) => (
+                                <div key={index} style={{ width: '100%', height: '300px', overflow: 'hidden', borderRadius: '10px' }}>
+                                    <img src={url} alt={`Room Content ${index}`} style={imgStyles} onClick={() => handleImageClick(url)} />
+                                </div>
+                            ))
+                        )}
                     </div>
                 </Tab>
             </Tabs>
@@ -168,6 +171,8 @@ const Explore = () => {
         </>
     );
 
+
 };
 
 export default Explore;
+

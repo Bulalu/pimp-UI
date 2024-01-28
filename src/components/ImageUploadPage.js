@@ -5,8 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ThreeDots } from 'react-loader-spinner';
 import { downloadPhoto } from './utils';
+import Dropdown from 'react-bootstrap/Dropdown';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const SERVER_DOWN = true
+const SERVER_DOWN = false
+
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
     color: '#333',
@@ -53,6 +56,7 @@ const style = {
         top: '10px',
         left: '10px'
     },
+
     image: {
         maxWidth: '100%',
         height: 'auto',
@@ -63,22 +67,27 @@ const style = {
         borderRadius: '5px',
         boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
     },
+
     compareSlider: {
         maxWidth: '60%',
         margin: '0 auto',
         marginTop: '20px',
-        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)'
-    },
+        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+      
+      },
+
     infoText: {
         fontSize: '1rem',
         color: '#007AFF',
         marginTop: '10px'
     },
+
     footer: {
         fontSize: '0.8rem',
         color: '#007AFF',
         marginTop: '30px'
     },
+
     loader: { // Style for the loader
         display: 'flex',
         justifyContent: 'center',
@@ -89,6 +98,7 @@ const style = {
     }
 };
 
+const BASE_URL = "https://zfeiyc0dr6o8vf-5000.proxy.runpod.net"
 
 const ImageUploadPage = () => {
     const [file, setFile] = useState(null);
@@ -99,7 +109,13 @@ const ImageUploadPage = () => {
     const [error, setError] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [styleOption, setStyleOption] = useState('');
+    const [uploadCategory, setUploadCategory] = useState('cars'); 
 
+    console.log("styleOption", styleOption)
+    console.log("prompt", prompt)
+    console.log("file", file)
+
+    // this should be done from the backend, coz when the state is refreshed we lose the data 🚨
     const [remainingRequests, setRemainingRequests] = useState(3);
 
     const navigate = useNavigate();
@@ -114,12 +130,16 @@ const ImageUploadPage = () => {
     const navigateToUpload = () => {
         navigate('/');
     };
+
     const handleDownloadClick = () => {
         if (restoredImage) {
           downloadPhoto(restoredImage, "restored-image.png");
         }
       };
-
+      const imageContainerVariants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 1.5 } }
+    };
       function downloadImage(imageUrl, filename = 'downloaded_image.png') {
         const anchorElement = document.createElement('a');
         anchorElement.href = imageUrl;
@@ -129,6 +149,11 @@ const ImageUploadPage = () => {
         anchorElement.click(); // Trigger click to download
         document.body.removeChild(anchorElement); // Remove the element after download
       }
+
+    // this is the main function that makes call to the backend and retreives the generated images
+    // TODO:
+    // 1. implement  strict error handling
+    // 2. render with websockets
       
     const handleGenerateClick = async () => {
         if (SERVER_DOWN) {
@@ -140,9 +165,11 @@ const ImageUploadPage = () => {
             setError('Please upload an image first.');
             return;
         }
+        if (!uploadCategory) {
+            setError('Please choose a category.');
+            return;
+        }
 
-
-          
 
         setLoading(true);
         setError(null);
@@ -152,13 +179,17 @@ const ImageUploadPage = () => {
         formData.append('image', file);
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
-
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
+        if (uploadCategory === 'cars') {
+            formData.append('type', 'cars');
+        } else if (uploadCategory === 'rooms') {
+            formData.append('type', 'rooms');
         }
+        // room type
+
 
         try {
-            const response = await fetch("https://fhgx6ogubqjq3l-5000.proxy.runpod.net/generate-image", {
+      
+            const response = await fetch(`${BASE_URL}/generate-image`, {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -186,24 +217,56 @@ const ImageUploadPage = () => {
         }
     };
 
+    const renderStyleOptions = () => {
+        if (uploadCategory === 'cars') {
+            return (
+                <>
+                    <option value="Photographic">Photographic</option>
+                    <option value="Cinematic">Cinematic</option>
+                    <option value="Anime">Anime</option>
+                    <option value="Fantasy art">Fantasy art</option>
+                    <option value="Neonpunk">Neonpunk</option>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <option value="Taboo">Taboo</option>
+                    <option value="Professional">Professional</option>
+                </>
+            );
+        }
+    };
+
     const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
     return (
         <motion.div style={style} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
             <motion.button style={style.homeButton} onClick={() => navigateToUpload()} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>Home</motion.button>
-            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }} style={{ color: '#FFFFFF' }}>Upload Your Car/Room Image</motion.h1>
-            {/* <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.3, type: 'spring', stiffness: 120 }}>Note: You can only generate 3 images per day. (hopefully 🤞)</motion.p> */}
-            <motion.p style={style.infoText} initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}>You have {remainingRequests} {remainingRequests === 1 ? 'request' : 'requests'} remaining for today. 😉</motion.p>
-            <motion.input
-                type="text"
-                placeholder="Enter your prompt"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                style={style.input}
-                initial={{ y: -250 }}
-                animate={{ y: -10 }}
-                transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
-            />
+            <motion.h1 initial={{ y: -250 }} animate={{ y: -10 }} transition={{ delay: 0.2, type: 'spring', stiffness: 120 }} style={{ color: '#FFFFFF' }}>Upload Your {uploadCategory === 'cars' ? 'Car' : 'Room'} Image</motion.h1>
+            <Dropdown>
+                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                    {uploadCategory === 'cars' ? 'Cars' : 'Rooms'}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                    <Dropdown.Item onClick={() => setUploadCategory('cars')}>Cars</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setUploadCategory('rooms')}>Rooms</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+    
+            {uploadCategory === 'cars' && (
+                <motion.input
+                    type="text"
+                    placeholder="Enter your prompt"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    style={style.input}
+                    initial={{ y: -250 }}
+                    animate={{ y: -10 }}
+                    transition={{ delay: 0.4, type: 'spring', stiffness: 120 }}
+                />
+            )}
+    
             <motion.select
                 value={styleOption}
                 onChange={(e) => setStyleOption(e.target.value)}
@@ -212,19 +275,31 @@ const ImageUploadPage = () => {
                 animate={{ y: -10 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 120 }}
             >
-                <option value="">Select Style</option>
-                <option value="Photographic">Photographic</option>
-                <option value="Cinematic">Cinematic</option>
-                <option value="Anime">Anime</option>
-                <option value="Fantasy art">Fantasy art</option>
-                <option value="Neonpunk">Neonpunk</option>
+                {uploadCategory === 'cars' ? (
+                    <>
+                        <option value="Photographic">Photographic</option>
+                        <option value="Cinematic">Cinematic</option>
+                        <option value="Anime">Anime</option>
+                        <option value="Fantasy art">Fantasy art</option>
+                        <option value="Neonpunk">Neonpunk</option>
+                    </>
+                ) : uploadCategory === 'rooms' ? (
+                    <>
+                        <option value="Tropical">Tropical</option>
+                        <option value="Modern">Modern</option>
+                        <option value="Kids">Kids</option>
+                        <option value="Anime">Anime</option>
+                    </>
+                ) : null}
             </motion.select>
+            
             {error && <p>Error: {error}</p>}
             <div {...getRootProps()} style={style.dropzone}>
                 <input {...getInputProps()} accept="image/*" />
-                <p>Drag 'n' drop your car image here, or click to select a file</p>
-                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image}/>}
+                <p>Drag 'n' drop your {uploadCategory === 'cars' ? 'car' : 'room'} image here, or click to select a file</p>
+                {originalImageUrl && <img src={originalImageUrl} alt="Preview" style={style.image} />}
             </div>
+    
             <motion.button style={style.button} onClick={handleGenerateClick} disabled={loading} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 {loading ? <ThreeDots color="#EFEFF0" height={50} width={50} /> : 'Generate'}
             </motion.button>
@@ -233,15 +308,18 @@ const ImageUploadPage = () => {
                     <div style={style.compareSlider}>
                         <CompareSlider original={originalImageUrl} restored={restoredImage} />
                     </div>
-                   <button onClick={() => downloadImage(restoredImage, "restoredImage.png")} style={style.button}>
+                    <button onClick={() => downloadImage(restoredImage, "restoredImage.png")} style={style.button}>
                         Download Image
-                        </button>
-
+                    </button>
                 </>
             )}
+            
             <p style={style.footer}>Built by <a href="https://twitter.com/elisha_bulalu" target="_blank" rel="noopener noreferrer">@elisha_bulalu</a></p>
         </motion.div>
     );
+    
 };
 
 export default ImageUploadPage;
+
+

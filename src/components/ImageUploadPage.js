@@ -9,6 +9,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SERVER_DOWN = true
+
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
     color: '#333',
@@ -96,6 +97,8 @@ const style = {
     }
 };
 
+const BASE_URL = "https://zfeiyc0dr6o8vf-5000.proxy.runpod.net"
+
 const ImageUploadPage = () => {
     const [file, setFile] = useState(null);
     const [restoredImage, setRestoredImage] = useState(null);
@@ -107,6 +110,8 @@ const ImageUploadPage = () => {
     const [styleOption, setStyleOption] = useState('');
     const [uploadCategory, setUploadCategory] = useState('cars'); 
 
+    console.log("styleOption", styleOption)
+    console.log("prompt", prompt)
 
     const [remainingRequests, setRemainingRequests] = useState(3);
 
@@ -138,6 +143,11 @@ const ImageUploadPage = () => {
         anchorElement.click(); // Trigger click to download
         document.body.removeChild(anchorElement); // Remove the element after download
       }
+
+    // this is the main function that makes call to the backend and retreives the generated images
+    // TODO:
+    // 1. implement  strict error handling
+    // 2. render with websockets
       
     const handleGenerateClick = async () => {
         if (SERVER_DOWN) {
@@ -162,12 +172,11 @@ const ImageUploadPage = () => {
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
 
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
+    
 
         try {
-            const response = await fetch("https://fhgx6ogubqjq3l-5000.proxy.runpod.net/generate-image", {
+      
+            const response = await fetch(`${BASE_URL}/generate-image`, {
                 method: "POST",
                 body: formData,
                 headers: {

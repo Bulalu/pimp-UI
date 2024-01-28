@@ -10,36 +10,37 @@ from flask_cors import CORS
 import uuid
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils import style_list
+
 
 # TODO 🚨
-# scale the api ✅
+# scale the api ✅ ?
 # create mobile version
 # limit the number of requests for users ✅
-# expose the images on firebase to the UI
+# expose the images on firebase to the UI ✅
 # enable generations for more images
 
 app = Flask(__name__)
 CORS(app) 
 
+# Check if CUDA is available and set the device accordingly
+# device = "cuda" if torch.cuda.is_available() else "cpu"
 
 #firebase Configes
 import firebase_admin
 from firebase_admin import credentials, storage
 
-# make sure you have a firebase config file
-cred = credentials.Certificate("your firebase config json file")
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'your-bucket'
-})
 
+cred = credentials.Certificate("path-to-your-json")
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'storage-bucket-name'
+})
 # Global variables for models
 pipe = None
 midas_depth = None
 models_loaded = False
 
 #setup limits
-MY_IP = 'test'
+MY_IP = ''
 
 def custom_key_func():
     if request.remote_addr == MY_IP:
@@ -87,6 +88,58 @@ def load_models():
         
 
 
+style_list = [
+    {
+        "name": "(No style)",
+        "prompt": "{prompt}",
+        "negative_prompt": "",
+    },
+    {
+        "name": "Cinematic",
+        "prompt": "cinematic still {prompt} . emotional, harmonious, vignette, highly detailed, high budget, bokeh, cinemascope, moody, epic, gorgeous, film grain, grainy",
+        "negative_prompt": "anime, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured",
+    },
+    {
+        "name": "3D Model",
+        "prompt": "professional 3d model {prompt} . octane render, highly detailed, volumetric, dramatic lighting",
+        "negative_prompt": "ugly, deformed, noisy, low poly, blurry, painting",
+    },
+    {
+        "name": "Anime",
+        "prompt": "anime artwork {prompt} . anime style, key visual, vibrant, studio anime,  highly detailed",
+        "negative_prompt": "photo, deformed, black and white, realism, disfigured, low contrast",
+    },
+    {
+        "name": "Digital Art",
+        "prompt": "concept art {prompt} . digital artwork, illustrative, painterly, matte painting, highly detailed",
+        "negative_prompt": "photo, photorealistic, realism, ugly",
+    },
+    {
+        "name": "Photographic",
+        "prompt": "cinematic photo {prompt} . 35mm photograph, film, bokeh, professional, 4k, highly detailed",
+        "negative_prompt": "drawing, painting, crayon, sketch, graphite, impressionist, noisy, blurry, soft, deformed, ugly",
+    },
+    {
+        "name": "Pixel art",
+        "prompt": "pixel-art {prompt} . low-res, blocky, pixel art style, 8-bit graphics",
+        "negative_prompt": "sloppy, messy, blurry, noisy, highly detailed, ultra textured, photo, realistic",
+    },
+    {
+        "name": "Fantasy art",
+        "prompt": "ethereal fantasy concept art of  {prompt} . magnificent, celestial, ethereal, painterly, epic, majestic, magical, fantasy art, cover art, dreamy",
+        "negative_prompt": "photographic, realistic, realism, 35mm film, dslr, cropped, frame, text, deformed, glitch, noise, noisy, off-center, deformed, cross-eyed, closed eyes, bad anatomy, ugly, disfigured, sloppy, duplicate, mutated, black and white",
+    },
+    {
+        "name": "Neonpunk",
+        "prompt": "neonpunk style {prompt} . cyberpunk, vaporwave, neon, vibes, vibrant, stunningly beautiful, crisp, detailed, sleek, ultramodern, magenta highlights, dark purple shadows, high contrast, cinematic, ultra detailed, intricate, professional",
+        "negative_prompt": "painting, drawing, illustration, glitch, deformed, mutated, cross-eyed, ugly, disfigured",
+    },
+    {
+        "name": "Manga",
+        "prompt": "manga style {prompt} . vibrant, high-energy, detailed, iconic, Japanese comic style",
+        "negative_prompt": "ugly, deformed, noisy, blurry, low contrast, realism, photorealistic, Western comic style",
+    },
+]
 
 
 styles = {k["name"]: (k["prompt"], k["negative_prompt"]) for k in style_list}
@@ -178,7 +231,7 @@ def generate_image():
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "oops, something went wrong while generating"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

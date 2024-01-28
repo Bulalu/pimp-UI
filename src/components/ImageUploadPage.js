@@ -8,7 +8,7 @@ import { downloadPhoto } from './utils';
 import Dropdown from 'react-bootstrap/Dropdown';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const SERVER_DOWN = true
+const SERVER_DOWN = false
 
 const style = {
     fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue, sans-serif',
@@ -112,7 +112,9 @@ const ImageUploadPage = () => {
 
     console.log("styleOption", styleOption)
     console.log("prompt", prompt)
+    console.log("file", file)
 
+    // this should be done from the backend, coz when the state is refreshed we lose the data 🚨
     const [remainingRequests, setRemainingRequests] = useState(3);
 
     const navigate = useNavigate();
@@ -133,7 +135,10 @@ const ImageUploadPage = () => {
           downloadPhoto(restoredImage, "restored-image.png");
         }
       };
-
+      const imageContainerVariants = {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 1.5 } }
+    };
       function downloadImage(imageUrl, filename = 'downloaded_image.png') {
         const anchorElement = document.createElement('a');
         anchorElement.href = imageUrl;
@@ -159,9 +164,11 @@ const ImageUploadPage = () => {
             setError('Please upload an image first.');
             return;
         }
+        if (!uploadCategory) {
+            setError('Please choose a category.');
+            return;
+        }
 
-
-          
 
         setLoading(true);
         setError(null);
@@ -171,8 +178,13 @@ const ImageUploadPage = () => {
         formData.append('image', file);
         formData.append('prompt', prompt);
         formData.append('style', styleOption);
+        if (uploadCategory === 'cars') {
+            formData.append('type', 'cars');
+        } else if (uploadCategory === 'rooms') {
+            formData.append('type', 'rooms');
+        }
+        // room type
 
-    
 
         try {
       
@@ -270,12 +282,14 @@ const ImageUploadPage = () => {
                         <option value="Fantasy art">Fantasy art</option>
                         <option value="Neonpunk">Neonpunk</option>
                     </>
-                ) : (
+                ) : uploadCategory === 'rooms' ? (
                     <>
-                        <option value="Taboo">Taboo</option>
-                        <option value="Professional">Professional</option>
+                        <option value="Tropical">Tropical</option>
+                        <option value="Modern">Modern</option>
+                        <option value="Kids">Kids</option>
+                        <option value="Anime">Anime</option>
                     </>
-                )}
+                ) : null}
             </motion.select>
             
             {error && <p>Error: {error}</p>}
